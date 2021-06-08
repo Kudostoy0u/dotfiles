@@ -6,7 +6,7 @@
 
 * Neovim config - .vimrc
 
-![image](https://user-images.githubusercontent.com/69732000/121108788-fb1be880-c7cf-11eb-9be2-2d5bdf04ba2e.png)
+![image](https://user-images.githubusercontent.com/69732000/121109017-5d74e900-c7d0-11eb-9c5a-f93b5d5657a8.png)
 
 * Desktop Environment config - .xinitc (KDE plasma 5 on Garuda Linux)
 
