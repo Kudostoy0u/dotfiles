@@ -1,70 +1,120 @@
-" Keep current color settings
-syntax enable
-" Turn on detection, plugin, and indent
-filetype plugin indent on
-" Fish syntax checking
-call plug#begin('~/.vim/plugged')
-" Language server
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-" Theme
-Plug 'drewtempelmeyer/palenight.vim'
-" File explorer
-Plug 'preservim/nerdtree'
-" Icons for file explorer
-Plug 'ryanoasis/vim-devicons'
-" Color icons for file explorer
-Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
-" Automatically add bracket pairs
-Plug 'LunarWatcher/auto-pairs', { 'tag': '*' }
-" Statusline
-Plug 'ourigen/skyline.vim'
-" Visual indicator of indents
-Plug 'Yggdroot/indentLine'
-" Indent lines even if there's nothing there (addon)
-Plug 'lukas-reineke/indent-blankline.nvim'
-call plug#end()
-" Custom escape keybind
-inoremap hzh <Esc>
-" Exit Vim if NERDTree is the only window left.
-autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() |
-    \ quit | endif
-" Start NERDTree and put the cursor back in the other window.
-autocmd VimEnter * NERDTree | wincmd p
-" Move around windows
-nnoremap <C-J> <C-W>j
-nnoremap <C-K> <C-W>k
-nnoremap <C-L> <C-W>l
-nnoremap <C-H> <C-W>h
-" CTRL-N to toggle Nerdtree
-nmap <C-n> :NERDTreeToggle<CR>
-" Save+Exit and convert tabs to spaces
-nnoremap <C-s> :retab<ENTER>:xa<CR> 
-" open terminal
-nmap <C-t> :tabnew<Space><Bar><Space>terminal<ENTER>i
-" Exit without saving
-map <C-c> <Esc>:qa!<CR>
-" Number the lines
-set number
-" Palenight theme
-set background=dark
-  set termguicolors
-colorscheme palenight
-" Change tab length
-set tabstop=2 shiftwidth=2 expandtab
-" VScode shorthand for console.log
-imap log<Enter> console.log()<Left>
-" Press enter to autocomplete
-inoremap <silent><expr> <Cr> pumvisible() ? coc#_select_confirm() : "\<C-g>u\<CR>"
-" Paste text without the mappings changing the pasted text
-imap <C-v> <Esc>:set<Space>paste<Enter>"+p:set<Space>nopaste<Enter>i
-" Add signcolumn to editor
-autocmd VimEnter * set scl=yes 
-" Escape terminal with escape button
-tnoremap <Esc> <C-\><C-n>:bd!<CR>
-" Fancier status line
-let g:airline_powerline_fonts=1
-" More dots for the visual indication of the indented lines
-let g:indentLine_char = "┊"
-" Hide the tildes trailing vim
-autocmd VimEnter * hi NonText guifg=bg
-set noshowmode
+# No introductory sentence
+set -g -x fish_greeting ''
+
+# Quick way to access fish config
+alias fishrc='nvim ~/.config/fish/config.fish'
+
+# Quick way to access vim config
+alias vimrc='nvim ~/.vimrc'
+
+# Quick way to cd back n directories
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+alias ......='cd ../../../../..'
+
+# Shorthand of zoxide
+alias z="zoxide"
+
+# Initialize zoxide
+z init fish | source
+
+# Because sometimes I forget to type the "n"
+alias vim="nvim"
+
+# Add directories to path
+fish_add_path /home/kudos/.cargo/bin
+fish_add_path /home/kudos/.local/bin
+
+# When I want to use the real cat
+alias meow="/usr/bin/cat"
+
+# Because bat defaults to batcat for some reason
+alias bat="batcat"
+
+# Use bat instead of cat
+alias cat="bat"
+
+# When will I ever use apt without sudo?
+alias apt="sudo apt"
+
+# Quick way to install packages
+function get
+  apt install $argv[1]
+end
+
+# Quick way to update
+alias update="apt update && apt upgrade -y"
+
+# Generated for envman. Do not edit.
+test -s "$HOME/.config/envman/load.fish"; and source "$HOME/.config/envman/load.fish"
+
+# Use double bang in fish to execute previous commands
+
+function bind_bang
+    switch (commandline --current-token)[-1]
+    case "!"
+        # Without the `--`, the functionality can break when completing
+        # flags used in the history (since, in certain edge cases
+        # `commandline` will assume that *it* should try to interpret
+        # the flag)
+        commandline --current-token -- $history[1]
+        commandline --function repaint
+    case "*"
+        commandline --insert !
+    end
+end
+
+function bind_dollar
+    switch (commandline --current-token)[-1]
+    # This case lets us still type a literal `!$` if we need to (by
+    # typing `!\$`). Probably overkill.
+    case "*!\\"
+        # Without the `--`, the functionality can break when completing
+        # flags used in the history (since, in certain edge cases
+        # `commandline` will assume that *it* should try to interpret
+        # the flag)
+        commandline --current-token -- (echo -ns (commandline --current-token)[-1] | head -c '-1')
+        commandline --insert '$'
+    case "!"
+        commandline --current-token ""
+        commandline --function history-token-search-backward
+
+
+    # Main difference from referenced version is this `*!` case
+    # =========================================================
+    #
+    # If the `!$` is preceded by any text, search backward for tokens
+    # that contain that text as a substring. E.g., if we'd previously
+    # run
+    #
+    #   git checkout -b a_feature_branch
+    #   git checkout master
+    #
+    # then the `fea!$` in the following would be replaced with
+    # `a_feature_branch`
+    #
+    #   git branch -d fea!$
+    #
+    # and our command line would look like
+    #
+    #   git branch -d a_feature_branch
+    #
+    case "*!"
+        # Without the `--`, the functionality can break when completing
+        # flags used in the history (since, in certain edge cases
+        # `commandline` will assume that *it* should try to interpret
+        # the flag)
+        commandline --current-token -- (echo -ns (commandline --current-token)[-1] | head -c '-1')
+        commandline --function history-token-search-backward
+    case "*"
+        commandline --insert '$'
+    end
+end
+
+function fish_user_key_bindings
+    bind ! bind_bang
+    bind '$' bind_dollar
+end
+set -q GHCUP_INSTALL_BASE_PREFIX[1]; or set GHCUP_INSTALL_BASE_PREFIX $HOME ; test -f /home/kudos/.ghcup/env ; and set -gx PATH $HOME/.cabal/bin /home/kudos/.ghcup/bin $PATH # ghcup-env
