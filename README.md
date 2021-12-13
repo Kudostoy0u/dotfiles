@@ -1,6 +1,6 @@
 # My dotfiles for
 
-* Fish (shell) config
+* Fish (shell) config - config.fish
 
 ![image](https://user-images.githubusercontent.com/69732000/121108354-39fd6e80-c7cf-11eb-9d50-954753d11a19.png)
 
