@@ -118,3 +118,4 @@ function fish_user_key_bindings
     bind '$' bind_dollar
 end
 set -q GHCUP_INSTALL_BASE_PREFIX[1]; or set GHCUP_INSTALL_BASE_PREFIX $HOME ; test -f /home/kudos/.ghcup/env ; and set -gx PATH $HOME/.cabal/bin /home/kudos/.ghcup/bin $PATH # ghcup-env
+set PATH $PATH:/usr/local/go/bin
